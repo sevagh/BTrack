@@ -291,22 +291,52 @@ static PyMethodDef btrack_methods[] = {
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
 
+#if PY_MAJOR_VERSION >= 3
+static struct PyModuleDef btrack_moduledef = {
+    PyModuleDef_HEAD_INIT,
+    "btrack",
+    "Real-time beat tracker",
+    -1,
+    btrack_methods,
+};
+#endif
+
 //=======================================================================
+#if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC PyInit_btrack(void)
+{
+    import_array();
+    return PyModule_Create(&btrack_moduledef);
+#else
 PyMODINIT_FUNC initbtrack(void)
 {
     (void)Py_InitModule("btrack", btrack_methods);
     import_array();
+#endif
 }
 
 //=======================================================================
+#if PY_MAJOR_VERSION >= 3
+int main(int argc, wchar_t *argv[])
+#else
 int main(int argc, char *argv[])
+#endif
 {
     /* Pass argv[0] to the Python interpreter */
+
+#if PY_MAJOR_VERSION >= 3
+    PySys_SetArgv(argc, argv);
+#else
     Py_SetProgramName(argv[0]);
-    
+#endif
+
     /* Initialize the Python interpreter.  Required. */
     Py_Initialize();
     
     /* Add a static module */
+#if PY_MAJOR_VERSION >= 3
+    PyInit_btrack();
+#else
     initbtrack();
+#endif
 }
